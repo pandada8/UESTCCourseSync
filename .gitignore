@@ -1,0 +1,12 @@
+# Ignore the pycharm file
+.idea/
+# Ignore the pyc
+*.pyc
+# Also the virtualenv
+.env
+bower_components
+__pycache__
+*.sublime-workspace
+*.sublime-project
+default.db
+upload/
