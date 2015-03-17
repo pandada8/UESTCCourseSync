@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <title>Sync Course 同步你的课程</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename="semantic.min.css") }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename="font.css")}}">
+        <link rel="stylesheet" href="{{ url_for('static', filename="index.css")}}">
+        <script src="{{ url_for('static', filename="jquery.min.js") }}"></script>
+        <script src="{{ url_for('static', filename="semantic.min.js") }}"></script>
+        <script>
+        $(function(){
+            $('#jump').click(function(){
+                $("html, body").animate({ scrollTop: $(window).height() }, 750 );
+            })
+            $('form a').click(function(){
+                var data = {}
+                $('form').addClass('loading')
+                $('form').serializeArray().forEach(function(i){
+                    data[i.name] = i.value
+                })
+                $.post('/add_to_list', data, function(ret){
+                    $('form').removeClass('loading')
+                    $('.dimmer').addClass('active')
+                })
+            })
+        })
+        </script>
+    </head>
+    <body>
+        <section class="screen1">
+            <div class="center">
+                <div class="announce">
+                    <h1 class="huge">Export your Course !</h1>
+                    <h2 class="sub header">Help you keep out with 超×课程表</h2>
+                    <p class="grey">This service is currently only avaliable in <b>UESTC<b></p>
+                </div>
+                <div class="ui buttons big">
+                    <div class="ui inverted basic button">Why use this?</div>
+                    <div class="or"></div>
+                    <a class="ui positive button" id="jump">Export Now!</a>
+                </div>
+            </div>
+        </section>
+<!--         <section class="screen2">
+            <div class="center">
+                <h1 class="header">Why choose this?</h1>
+
+            </div>
+        </section> -->
+        <section class="screen3">
+            <div class="ui centered alighed grid center">
+                <div class="ten wide column">
+                    <form class="ui form segment ">
+                        <h2 class="ui header">Fill the info to export your class table</h2>
+                        <h4 class="ui dividing header">Account Infomation</h4>
+                        <div class="tow fields">
+                            <div class="eight wide field">
+                                <label>Student ID</label>
+                                <input type="text" name="username" placeholder="Your stu id, eg. 2014010101001">
+                            </div>
+                            <div class="eight wide field">
+                                <label>Password</label>
+                                <input type="password" name="password" placeholder="The password to login into portal.">
+                            </div>
+                        </div>
+                        <div class="sixteen wide field">
+                            <label>E-mail</label>
+                            <input type="text" name="email" placeholder="The address is used to send the exported class table.">
+                        </div>
+                        <a class="fluid ui positive button">Submit</a>
+                    </form>
+                    <div class="ui dimmer">
+                        <h2 class="ui inverted icon header" style="padding:2em;">
+                            <i class="mail icon"></i>
+                            You classtable will be exported and email to you at the first time!
+                        </h2>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+    </body>
+</html>
