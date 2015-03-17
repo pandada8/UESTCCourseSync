@@ -8,5 +8,5 @@ bower_components
 __pycache__
 *.sublime-workspace
 *.sublime-project
-default.db
+*.db
 upload/
