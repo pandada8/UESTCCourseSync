@@ -1,6 +1,5 @@
 from peewee import Model, CharField, DateTimeField, TextField, IntegerField, CharField
 from playhouse import db_url
-from datetime import datetime
 
 db = db_url.connect("sqlite:///default.db")
 
