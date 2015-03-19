@@ -3,20 +3,17 @@ body {
   width: 100 %;
   height: 100 %;
 }
-section {
-  height: 100vh;
-  width: 100%;
-  display: table;
+div.section {
   color: white;
 }
-section.screen1 {
+div.section.screen1 {
   background-color: #0D7661;
   text-align: center;
 }
-section.screen2 {
+div.section.screen2 {
   background-color: #5FBBFC;
 }
-section.screen3 {
+div.section.screen3 {
   background-color: #68D8CE;
 }
 h1.huge {
@@ -25,8 +22,4 @@ h1.huge {
 .announce {
   margin-bottom: 2em;
   margin-top: -1em;
-}
-.center {
-  display: table-cell !important;
-  vertical-align: middle;
 }
