@@ -82,6 +82,7 @@ class User:
         self.logger.setLevel(logging.INFO)
 
         self.courses = {}
+        self.terms = []
 
     def getToken(self):
         self.logger.info('生成跳转网址...')
@@ -146,9 +147,9 @@ class User:
         def parseCourse(text):
             temp = json.loads('[' + re.search(r"(?<=TaskActivity\().+?(?=\);)", text).group() + "]")
             basicData = Course(temp)
-            basicData.time.extend([[i[0], i[2], temp[-1], temp[5]] for i in re.findall(r'(\d+)(\*unitCount\+)(\d+);', text)])
+            for i in re.findall(r'(\d+)(\*unitCount\+)(\d+);', text):
+                basicData.time.append({"weekday": i[0], "time": [i[2]], "week": temp[-1], "location": temp[5]})
             return basicData
-        term = [i for i in self.terms if i['id'] == term_id][0]
 
         if term_id not in self.courses:
             source = self.s.post('http://eams.uestc.edu.cn/eams/courseTableForStd!courseTable.action', data={
@@ -171,10 +172,16 @@ class User:
                     _courses[i.id] = i
 
             # TODO merge the sibling course
-            
-
-
-
+            for i in courses:
+                time = i.time
+                i.time = []
+                for t in time:
+                    for ft in i.time:
+                        if abs(t[1] - ft[1]) == 1:
+                            ft['time'].append(t['time'])
+                            break
+                    else:
+                        i.time.append(t)
 
             self.courses[term_id] = list(_courses.values())
             return self.courses[term_id]
