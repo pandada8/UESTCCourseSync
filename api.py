@@ -209,11 +209,12 @@ class User:
                 for t in i.time:
                     for n, w in enumerate(t[2]):
                         if int(w):
-                            targetTime = datetime.timedelta(days=7*n + int(t[0])) + the_first_day + CLASS[t[1]]
+                            targetTime = datetime.timedelta(days=7*n + int(min(t[0]))) + the_first_day + CLASS[t[1]]
+                            targetEndTime = datetime.timedelta(days=7*n + int(max(t[0])), minutes=45) + the_first_day + CLASS[t[1]]
                             # print(targetTime)
                             e = icalendar.Event()
                             e.add('dtstart', tz.localize(targetTime))
-                            e.add('dtend', tz.localize(targetTime + datetime.timedelta(minutes=45)))
+                            e.add('dtend', tz.localize(targetEndTime))
                             e['summary'] = "{} {}老师 {}".format(i.name.split('(')[0], i.teacher, t[3])
                             e['location'] = icalendar.vText(t[3])
                             # e['SEQUENCE'] = 1
