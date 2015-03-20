@@ -6,12 +6,12 @@ import json
 import icalendar
 import datetime
 import pytz
-from utils import md5
+import hashlib
+
 
 logging.basicConfig()  # init a basic output in terminal
 
 s = requests.session()
-
 
 CLASS_LENGTH = datetime.timedelta(minutes=45)
 
@@ -30,6 +30,9 @@ CLASS = {
     11: datetime.timedelta(hours=22, minutes=0)
 }
 
+
+def md5(s):
+    return hashlib.md5(s.encode('UTF')).hexdigest()
 
 
 
