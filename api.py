@@ -164,7 +164,7 @@ class User:
                 "Accept-Language": "zh-CN,zh;q=0.8"
             }).text
             # Strip the html code and get the js code
-            courses = [parseCourse(i) for i in re.findall(r'activity\s=\snew[\s\S]*?(?=activity\s=\s)', source)]
+            courses = [parseCourse(i[0]) for i in re.findall(r'(activity\s=\s.*(\s+\bindex[\s\S]*?activity;)+)', source)]
             # merge the same course
             _courses = {}
             for i in courses:
@@ -172,9 +172,9 @@ class User:
                     _courses[i.id].time.extend(i.time)
                 else:
                     _courses[i.id] = i
-
             # merge the sibling course
-            for i in courses:
+            course = _courses.values()
+            for i in course:
                 time, i.time = i.time, []
                 for t in time:
                     for ft in i.time:
