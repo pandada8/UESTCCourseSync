@@ -81,19 +81,19 @@ class User:
         self.s.headers.setdefault('X-Requested-With', 'XMLHttpRequest')
         self.s.headers.setdefault('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.22 Safari/537.36')
         self.logger = logging.getLogger('UESTC API')
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
 
         self.courses = {}
         self.terms = []
 
     def getToken(self):
         self.logger.info('生成跳转网址...')
-        html = self.s.get("https://uis.uestc.edu.cn/amserver/UI/Login", params={'goto': 'http://portal.uestc.edu.cn/login.portal'}).text
-        token = re.search(r'(?<=value=")[a-zA-Z0-9]{52}(?=">)', html)
-        if token:
-            self.logger.debug('Jump Token: %s', token.group())
-            return token.group()
-        else:
+        html = self.s.get("http://idas.uestc.edu.cn/authserver/login", params={'service': 'http://portal.uestc.edu.cn/login.portal'}).text
+        try:
+            token = pq(html)("input[name=lt]").attr("value")
+            self.logger.debug('Jump Token: %s', token)
+            return token
+        except:
             self.logger.critical('生成失败')
             self.logger.debug('returned data: \n%s', html)
             raise APIError
@@ -102,16 +102,16 @@ class User:
         self.logger.info('开始登陆...')
         token = self.getToken()
 
-        ret = self.s.post("https://uis.uestc.edu.cn/amserver/UI/Login", data={
-            "IDToken0": "",
-            "IDToken1": username,
-            "IDToken2": password,
-            "IDButton": "Submit",
-            "goto": token,
-            "encoded": "true",
-            "gx_charset": "UTF-8"
+        ret = self.s.post("http://idas.uestc.edu.cn/authserver/login", params={'service': 'http://portal.uestc.edu.cn/login.portal'}, data={
+            "username": username,
+            "password": password,
+            "dllt": "userNamePasswordLogin",
+            "rmShown": 1,
+            "lt": token,
+            "execution": "e1s1",
+            "_eventId": "submit"
         })
-        if ret.url == "http://portal.uestc.edu.cn/index.portal":
+        if ret.url.startswith("http://portal.uestc.edu.cn/index.portal"):
             self.logger.info('登陆成功')
         else:
             reason = pq(ret.text)('.AlrtErrTxt').text()
