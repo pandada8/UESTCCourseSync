@@ -70,7 +70,7 @@ class Course():
         })
 
     def __str__(self):
-        return "{} - {}".format(self.teacher, self.name)
+        return "{} - {}: {}".format(self.teacher, self.name, self.time)
 
 
 class User:
@@ -176,11 +176,12 @@ class User:
             course = _courses.values()
             for i in course:
                 time, i.time = i.time, []
-                for t in time:
-                    for ft in i.time:
-                        if abs(t['time'][0] - ft['time'][0]) == 1 and t['weekday'] == ft['weekday']:
-                            ft['time'].append(t['time'][0])
-                            break
+                time.sort(key=lambda x: (x['weekday'], x['time'][0]))
+                i.time.append(time[0])
+                for t in time[1:]:
+                    ft = i.time[-1]
+                    if abs(t['time'][0] - ft['time'][-1]) == 1 and t['weekday'] == ft['weekday']:
+                        ft['time'].append(t['time'][0])
                     else:
                         i.time.append(t)
 
@@ -215,7 +216,7 @@ class User:
                             e = icalendar.Event()
                             e.add('dtstart', tz.localize(targetTime))
                             e.add('dtend', tz.localize(targetEndTime))
-                            e['summary'] = "{} {}老师 {}".format(i.name.split('(')[0], i.teacher, t['location'])
+                            e['summary'] = "{} {} {}".format(i.name.split('(')[0], i.teacher + "老师" if i.teacher else "", t['location'])
                             e['location'] = icalendar.vText(t['location'])
                             # e['SEQUENCE'] = 1
                             e['TRANSP'] = icalendar.vText('OPAQUE')
