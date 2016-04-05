@@ -85,6 +85,7 @@ class User:
 
         self.courses = {}
         self.terms = []
+        self.stu = None
 
     def getToken(self):
         self.logger.info('生成跳转网址...')
@@ -145,6 +146,12 @@ class User:
         self.terms = ret
         return ret
 
+    def getId(self):
+        if not self.stu:
+            html = self.s.get("http://eams.uestc.edu.cn/eams/courseTableForStd.action").text
+            self.stu = re.findall(r'"ids"\,"(\d+?)"', html)[0]
+        return self.stu
+
     def getClasses(self, term_id):
         def parseCourse(text):
             temp = json.loads('[' + re.search(r"(?<=TaskActivity\().+?(?=\);)", text).group() + "]")
@@ -159,7 +166,7 @@ class User:
                 "setting.kind": "std",  # only student supported now
                 "startWeek": 1,
                 "semesterId": term_id,
-                "ids": '132081'  # unknow if this will change in different student or class
+                "ids": self.getId()
             }, headers={
                 "Accept-Language": "zh-CN,zh;q=0.8"
             }).text
