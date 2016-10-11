@@ -7,10 +7,9 @@ import icalendar
 import datetime
 import pytz
 import hashlib
-
+import browser_cookie3
 
 logging.basicConfig()  # init a basic output in terminal
-
 s = requests.session()
 
 CLASS_LENGTH = datetime.timedelta(minutes=45)
@@ -73,7 +72,7 @@ class Course():
         return "{} - {}: {}".format(self.teacher, self.name, self.time)
 
 
-class User:
+class UESTC:
 
     def __init__(self):
         self.s = requests.session()
@@ -99,7 +98,30 @@ class User:
             self.logger.debug('returned data: \n%s', html)
             raise APIError
 
-    def login(self, username, password):
+    def login_with_browser(self):
+        logging.info("Try loading Chrome Cookie")
+        cookies = browser_cookie3.load()
+        for i in cookies:
+            i.expires = None
+        self.s.cookies = cookies
+        if "欢迎您" in self.s.get("http://portal.uestc.edu.cn/").text:
+            self.logger.info("login success")
+            return True
+        else:
+            self.logger.info("login failed")
+            return False
+
+
+    def login(self):
+        if not self.login_with_browser():
+            username = input("学号:")
+            password = getpass.getpass("密码:")
+            if not self.login_with_password(username, password):
+                self.logger.error("Failed")
+                raise APIError
+
+
+    def login_with_password(self, username, password):
         self.logger.info('开始登陆...')
         token = self.getToken()
 
@@ -250,12 +272,11 @@ def sync():
                        \|_________|
   """)
 
-    u = User()
-    username = input('输入你的学号：')
-    password = getpass.getpass('输入密码：')
-    u.login(username, password)
+    u = UESTC()
+    
+    u.login()
     u.getSemester()
-    for i in u.terms:
+    for i in sorted(u.terms, key=lambda x: x.name):
         print("[{id:>2}] {schoolYear} 学年 {name} 学期".format_map(i))
     semsterId = int(input("输入学期:"))
     day = input('请输入开学第一周中某一天工作日(YYYY/MM/DD)：')
