@@ -99,7 +99,7 @@ class UESTC:
             raise APIError
 
     def login_with_browser(self):
-        logging.info("Try loading Chrome Cookie")
+        self.logger.info("Try loading Chrome Cookie")
         cookies = browser_cookie3.load()
         for i in cookies:
             i.expires = None
@@ -166,6 +166,8 @@ class UESTC:
             ret.extend(i)
         self.logger.info('载入学期成功, 共 %d 个学期', len(ret))
         self.terms = ret
+        self.s.post("http://eams.uestc.edu.cn/eams/dataQuery.action", data={'dataType': "projectId"})
+        self.s.post("http://eams.uestc.edu.cn/eams/dataQuery.action", data={'entityId': ""})
         return ret
 
     def getId(self):
@@ -276,7 +278,7 @@ def sync():
     
     u.login()
     u.getSemester()
-    for i in sorted(u.terms, key=lambda x: x.name):
+    for i in sorted(u.terms, key=lambda x: x['schoolYear'] + x['name']):
         print("[{id:>2}] {schoolYear} 学年 {name} 学期".format_map(i))
     semsterId = int(input("输入学期:"))
     day = input('请输入开学第一周中某一天工作日(YYYY/MM/DD)：')
